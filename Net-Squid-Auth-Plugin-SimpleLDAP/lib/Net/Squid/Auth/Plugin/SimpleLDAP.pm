@@ -15,7 +15,7 @@ Version 0.01.03
 
 =cut
 
-use version; our $VERSION = qv('0.01.03');
+use version; our $VERSION = qv('0.01.04');
 
 =head1 SYNOPSIS
 
@@ -160,8 +160,7 @@ sub is_valid {
 
 =head1 AUTHOR
 
-Alexei Znamensky, C<< <russoz at gmail.com> >>
-
+Alexei Znamensky, C<< <russoz at cpan.org> >>
 
 =head1 BUGS
 
@@ -175,7 +174,6 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc Net::Squid::Auth::Plugin::SimpleLDAP
-
 
 You can also look for information at:
 
@@ -210,6 +208,9 @@ L<http://search.cpan.org/dist/Net-Squid-Auth-Plugin-SimpleLDAP>
 
 =head1 ACKNOWLEDGEMENTS
 
+Luis "Fields" Motta Campos, who can now say:
+
+"The circle is now complete. When I left you, I was but the learner; now *I* am the master."
 
 =head1 COPYRIGHT & LICENSE
 
