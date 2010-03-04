@@ -2,15 +2,15 @@
 
 use Test::More tests => 5;
 
-use Net::Squid::Auth::Plugins::SimpleLDAP;
+use Net::Squid::Auth::Plugin::SimpleLDAP;
 
 sub check_failure {
   my $param = shift;
 
-  my $p = Net::Squid::Auth::Plugins::SimpleLDAP->new( $param );
+  my $p = Net::Squid::Auth::Plugin::SimpleLDAP->new( $param );
   return 0 unless $p;
 
-  eval { $p->initialize() }
+  eval { $p->initialize() };
   ok( $@,  );
 }
 

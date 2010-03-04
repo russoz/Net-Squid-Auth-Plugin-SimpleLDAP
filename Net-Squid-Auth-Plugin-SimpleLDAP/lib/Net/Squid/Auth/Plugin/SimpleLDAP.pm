@@ -101,8 +101,8 @@ sub initialize {
     $self->{_cfg}{objclass} = 'person' unless $self->{_cfg}{objclass};
 
     # required information
-    foreach $_ qw(binddn bindpw basedn server) {
-        croak "$/Missing config parameter \'" . $_ . "'" unless $config->{$_};
+    foreach my $_ qw(binddn bindpw basedn server) {
+        croak "$/Missing config parameter \'" . $_ . "'" unless $self->{_cfg}{$_};
     }
 
     # connect
