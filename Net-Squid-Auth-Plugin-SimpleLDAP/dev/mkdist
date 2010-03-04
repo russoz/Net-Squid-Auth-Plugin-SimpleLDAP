@@ -1,0 +1,15 @@
+# Generate Changes automagically:
+#
+# use git log --oneline
+#   how to specify the time stamp :-o)
+#
+
+# Make README
+( cd lib; perldoc -t -F Net/Squid/Auth/Plugin/SimpleLDAP.pm > ../README )
+git add README
+
+perl ./Build.PL && ./Build dist
+
+version=$(perl -nle 'if( /^version/ ) { s/^\S+\s+//; print; }' META.yml)
+git add META.yml
+git commit -m "DIST VERSION $version"
