@@ -18,7 +18,7 @@ SYNOPSIS
         server = myldap.server.somewhere       # mandatory
 
         # connection options
-        <NetLDAP>                     # optional section with
+        <NetLDAP>                              # optional section with
           port = N                             #   Net::LDAP's
           scheme = 'ldap' | 'ldaps' | 'ldapi'  #     constructor
           ...                                  #     options
