@@ -7,16 +7,15 @@ use Net::LDAP;
 
 =head1 NAME
 
-Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials validation plugin for 
-L<Net::Squid::Auth::Engine>
+Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials validation plugin for Net::Squid::Auth::Engine
 
 =head1 VERSION
 
-Version 0.01.04
+Version 0.01.05
 
 =cut
 
-use version; our $VERSION = qv('0.01.04');
+use version; our $VERSION = qv('0.01.05');
 
 =head1 SYNOPSIS
 
