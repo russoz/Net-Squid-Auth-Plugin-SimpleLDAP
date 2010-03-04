@@ -15,7 +15,7 @@ Version 0.01.05
 
 =cut
 
-use version; our $VERSION = qv('0.01.05');
+use version; our $VERSION = qv('0.01.06');
 
 =head1 SYNOPSIS
 
@@ -31,11 +31,11 @@ On C<$Config{InstallScript}/squid-auth-engine>'s configuration file:
     server = myldap.server.somewhere       # mandatory
 
     # connection options
-    <net_ldap_options>                     # optional section with
+    <NetLDAP>                     # optional section with
       port = N                             #   Net::LDAP's
       scheme = 'ldap' | 'ldaps' | 'ldapi'  #     constructor
       ...                                  #     options
-    </net_ldap_options>
+    </NetLDAP>
 
     # bind options
     binddn = cn=joedoe                     # mandatory
@@ -107,7 +107,7 @@ sub initialize {
 
     # connect
     $self->{ldap} =
-      Net::LDAP->new( $self->{_cfg}{server}, $self->{_cfg}{net_ldap_options} )
+      Net::LDAP->new( $self->{_cfg}{server}, $self->{_cfg}{NetLDAP} )
       || croak "Cannot connect to LDAP server: " . $self->{_cfg}{server};
 
     # bind
