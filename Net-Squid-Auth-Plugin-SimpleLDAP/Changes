@@ -1,10 +1,22 @@
 Revision history for Net-Squid-Auth-Plugin-SimpleLDAP
 
-0.01.04 22.02.2010
+0.01.06 04.03.2010
+        Changed the name of the Net::LDAP options section.
+        More TO DO. Upgraded VERSION.
+        Ran through perltidy
+
+0.01.05 04.03.2010
+        Fixed the module abstract.
+        Added t/perlcritic.t anf fixed MANIFEST
+
+0.01.04 03.03.2010
         Moved to github. See more at:
         http://github.com/russoz/Net--Squid--Auth--Plugin--SimpleLDAP
         Updated README.
         Added more perldoc lines.
+        Moved to Module::Build.
+        Added some tests.
+        Now allows config file to hold options for Net::LDAP.
 
 0.01.03 14.08.2009
         Public release
