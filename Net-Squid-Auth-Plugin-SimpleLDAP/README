@@ -1,118 +1,146 @@
-Net::Squid::Auth::PlugiUns:e:rSiCmopnlterLiDbAuPt(e3d)PNeertl::DSoqcuuimde:n:tAauttiho:n:Plugin::SimpleLDAP(3)
+NAME
+    Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials
+    validation plugin for Net::Squid::Auth::Engine
 
+VERSION
+    Version 0.01.04
 
+SYNOPSIS
+    If you're a system administrator trying to use Net::Squid::Auth::Engine
+    to validate your user's credentials using a LDAP server as a credentials
+    repository, do as described here:
 
-NNAAMMEE
-       Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials
-       validation plugin for Net::Squid::Auth::Engine
+    On "$Config{InstallScript}/squid-auth-engine"'s configuration file:
 
-VVEERRSSIIOONN
-       Version 0.01.03
+      plugin = SimpleLDAP
+      <SimpleLDAP>
+        # LDAP server
+        server = myldap.server.somewhere       # mandatory
 
-SSYYNNOOPPSSIISS
-       If you're a system administrator trying to use Net::Squid::Auth::Engine
-       to validate your user's credentials using a LDAP server as a
-       credentials repository, do as described here:
+        # connection options
+        <net_ldap_options>                     # optional section with
+          port = N                             #   Net::LDAP's
+          scheme = 'ldap' | 'ldaps' | 'ldapi'  #     constructor
+          ...                                  #     options
+        </net_ldap_options>
 
-       On "$Config{InstallScript}/squid-auth-engine"'s configuration file:
+        # bind options
+        binddn = cn=joedoe                     # mandatory
+        bindpw = secretpassword                # mandatory
 
-           plugin = SimpleLDAP
-           <SimpleLDAP>
-             server = myldap.server.somewhere
-             basedn = ou=mydept,o=mycompany.com
-             binddn = cn=joedoe
-             bindpw = secretpassword
-             objclass = inetOrgPerson (optional, defaults to "person")
-             userattr = uid (optional, defaults to "cn")
-             passattr = password (optional, defaults to "userPassword")
-           </SimpleLDAP>
+        # search options
+        basedn = ou=mydept,o=mycompany.com     # mandatory
+        objclass = inetOrgPerson               # opt, default "person"
+        userattr = uid                         # opt, default "cn"
+        passattr = password                    # opt, default "userPassword"
+      </SimpleLDAP>
 
-       This module will presume the users in your LDAP directory belong to the
-       object class "person", as defined in section 3.12 of RFC 4519, and the
-       user and password information will be looked for in the "cn" and
-       "userPassword" attributes, respectively.
+    Unless configured otherwise, this module will assume the users in your
+    LDAP directory belong to the object class "person", as defined in
+    section 3.12 of RFC 4519, and the user and password information will be
+    looked for in the "cn" and "userPassword" attributes, respectively.
 
-       On your Squid HTTP Cache configuration:
+    On your Squid HTTP Cache configuration:
 
-           auth_param basic /usr/bin/squid-auth-engine /etc/squid-auth-engine.conf
+        auth_param basic /usr/bin/squid-auth-engine /etc/squid-auth-engine.conf
 
-       And you're ready to use this module.
+    And you're ready to use this module.
 
-       If you're a developer, you might be interested in reading through the
-       source code of this module, in order to learn about it's internals and
-       how it works.  It may give you ideas about how to implement other
-       plugin modules for Net::Squid::Auth::Engine.
+    If you're a developer, you might be interested in reading through the
+    source code of this module, in order to learn about it's internals and
+    how it works. It may give you ideas about how to implement other plugin
+    modules for Net::Squid::Auth::Engine.
 
-FFUUNNCCTTIIOONNSS
-   nneeww(( $$ccoonnffiigg__hhaasshh ))
-       Constructor. Expects a hash reference with all the configuration under
-       the section _<_S_i_m_p_l_e_L_D_A_P_> in the
-       "$Config{InstallScript}/squid-auth-engine" as parameter. Returns a
-       plugin instance.
+FUNCTIONS
+  new( $config_hash )
+    Constructor. Expects a hash reference with all the configuration under
+    the section *<SimpleLDAP>* in the
+    "$Config{InstallScript}/squid-auth-engine" as parameter. Returns a
+    plugin instance.
 
-   _i_n_i_t_i_a_l_i_z_e_(_)
-   __sseeaarrcchh
-       Searches the LDAP server. It expects one parameter with a search string
-       for the username.  The search string must conform with the format used
-       in LDAP queries, as defined in section 3 of RFC 4515.
+  initialize()
+    Initialization method called upon instantiation. This provides an
+    opportunity for the plugin initialize itself, stablish database
+    connections and ensure it have all the necessary resources to verify the
+    credentials presented. It receives no parameters and expect no return
+    values.
 
-   iiss__vvaalliidd(( $$uusseerrnnaammee,, $$ppaasssswwoorrdd ))
-       This is the credential validation interface. It expects a username and
-       password as parameters and returns a boolean indicating if the
-       credentials are valid (i.e., are listed in the configuration file) or
-       not.
+  _search()
+    Searches the LDAP server. It expects one parameter with a search string
+    for the username. The search string must conform with the format used in
+    LDAP queries, as defined in section 3 of RFC 4515.
 
-AAUUTTHHOORR
-       Alexei Znamensky, "<russoz at gmail.com>"
+  is_valid( $username, $password )
+    This is the credential validation interface. It expects a username and
+    password as parameters and returns a boolean indicating if the
+    credentials are valid (i.e., are listed in the configuration file) or
+    not.
 
-BBUUGGSS
-       Please report any bugs or feature requests to
-       "bug-net-squid-auth-plugin-simpleldap at rt.cpan.org", or through the
-       web interface at
-       <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Squid-Auth-Plugin-SimpleLDAP>.
-       I will be notified, and then you'll automatically be notified of
-       progress on your bug as I make changes.
+AUTHOR
+    Alexei Znamensky, "<russoz at cpan.org>"
 
-SSUUPPPPOORRTT
-       You can find documentation for this module with the perldoc command.
+BUGS
+    Please report any bugs or feature requests to
+    "bug-net-squid-auth-plugin-simpleldap at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Squid-Auth-Plugin-Si
+    mpleLDAP>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
 
-           perldoc Net::Squid::Auth::Plugin::SimpleLDAP
+SUPPORT
+    You can find documentation for this module with the perldoc command.
 
-       You can also look for information at:
+        perldoc Net::Squid::Auth::Plugin::SimpleLDAP
 
-       ·   RFC 4515 - Lightweight Directory Access Protocol (LDAP): String
-           Representation of Search Filters
+    Or take a look at the github site to be up to date:
 
-           <http://www.faqs.org/rfcs/rfc4515.html>
+        <http://russoz.github.com/Net-Squid-Auth-Plugin-SimpleLDAP>
 
-       ·   RFC 4519 - Lightweight Directory Access Protocol (LDAP): Schema for
-           User Applications
+    You can also look for information at:
 
-           <http://www.faqs.org/rfcs/rfc4519.html>
+    *   RFC 4515 - Lightweight Directory Access Protocol (LDAP): String
+        Representation of Search Filters
 
-       ·   RT: CPAN's request tracker
+        <http://www.faqs.org/rfcs/rfc4515.html>
 
-           <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Squid-Auth-Plugin-SimpleLDAP>
+    *   RFC 4519 - Lightweight Directory Access Protocol (LDAP): Schema for
+        User Applications
 
-       ·   AnnoCPAN: Annotated CPAN documentation
+        <http://www.faqs.org/rfcs/rfc4519.html>
 
-           <http://annocpan.org/dist/Net-Squid-Auth-Plugin-SimpleLDAP>
+    *   RT: CPAN's request tracker
 
-       ·   CPAN Ratings
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Squid-Auth-Plugin-Simp
+        leLDAP>
 
-           <http://cpanratings.perl.org/d/Net-Squid-Auth-Plugin-SimpleLDAP>
+    *   AnnoCPAN: Annotated CPAN documentation
 
-       ·   Search CPAN
+        <http://annocpan.org/dist/Net-Squid-Auth-Plugin-SimpleLDAP>
 
-           <http://search.cpan.org/dist/Net-Squid-Auth-Plugin-SimpleLDAP>
+    *   CPAN Ratings
 
-AACCKKNNOOWWLLEEDDGGEEMMEENNTTSS
-CCOOPPYYRRIIGGHHTT && LLIICCEENNSSEE
-       Copyright 2008 Alexei Znamensky, all rights reserved.
+        <http://cpanratings.perl.org/d/Net-Squid-Auth-Plugin-SimpleLDAP>
 
-       This program is free software; you can redistribute it and/or modify it
-       under the same terms as Perl itself.
+    *   Search CPAN
 
+        <http://search.cpan.org/dist/Net-Squid-Auth-Plugin-SimpleLDAP>
 
+SEE ALSO
+    Net::Squid::Auth::Engine, Net::LDAP
 
-perl v5.10.0                      2008-0N8e-t1:4:Squid::Auth::Plugin::SimpleLDAP(3)
+ACKNOWLEDGEMENTS
+    Luis "Fields" Motta Campos "<lmc at cpan.org>", who could now say:
+
+    "The circle is now complete. When I left you, I was but the learner; now
+    *I* am the master."
+
+    To what I'd reply:
+
+    "Only a master of Perl, Fields"
+
+COPYRIGHT & LICENSE
+    Copyright 2008,2010 Alexei Znamensky, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

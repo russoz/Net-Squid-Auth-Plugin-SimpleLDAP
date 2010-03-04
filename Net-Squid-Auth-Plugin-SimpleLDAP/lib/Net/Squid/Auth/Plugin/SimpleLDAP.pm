@@ -7,11 +7,12 @@ use Net::LDAP;
 
 =head1 NAME
 
-Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials validation plugin for Net::Squid::Auth::Engine
+Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials validation plugin for 
+L<Net::Squid::Auth::Engine>
 
 =head1 VERSION
 
-Version 0.01.03
+Version 0.01.04
 
 =cut
 
@@ -25,21 +26,33 @@ repository, do as described here:
 
 On C<$Config{InstallScript}/squid-auth-engine>'s configuration file:
 
-    plugin = SimpleLDAP
-    <SimpleLDAP>
-      server = myldap.server.somewhere
-      basedn = ou=mydept,o=mycompany.com
-      binddn = cn=joedoe
-      bindpw = secretpassword
-      objclass = inetOrgPerson (optional, defaults to "person")
-      userattr = uid (optional, defaults to "cn")
-      passattr = password (optional, defaults to "userPassword")
-    </SimpleLDAP>
+  plugin = SimpleLDAP
+  <SimpleLDAP>
+    # LDAP server
+    server = myldap.server.somewhere       # mandatory
 
-This module will presume the users in your LDAP directory belong to the
-object class C<person>, as defined in section 3.12 of RFC 4519, and the user
-and password information will be looked for in the C<cn> and C<userPassword>
-attributes, respectively.
+    # connection options
+    <net_ldap_options>                     # optional section with
+      port = N                             #   Net::LDAP's
+      scheme = 'ldap' | 'ldaps' | 'ldapi'  #     constructor
+      ...                                  #     options
+    </net_ldap_options>
+
+    # bind options
+    binddn = cn=joedoe                     # mandatory
+    bindpw = secretpassword                # mandatory
+
+    # search options
+    basedn = ou=mydept,o=mycompany.com     # mandatory
+    objclass = inetOrgPerson               # opt, default "person"
+    userattr = uid                         # opt, default "cn"
+    passattr = password                    # opt, default "userPassword"
+  </SimpleLDAP>
+
+Unless configured otherwise, this module will assume the users in your LDAP 
+directory belong to the object class C<person>, as defined in section 3.12 of 
+RFC 4519, and the B<user> and B<password> information will be looked for in the 
+C<cn> and C<userPassword> attributes, respectively.
 
 On your Squid HTTP Cache configuration:
 
@@ -52,42 +65,59 @@ code of this module, in order to learn about it's internals and how it works.
 It may give you ideas about how to implement other plugin modules for
 L<Net::Squid::Auth::Engine>. 
 
-
 =head1 FUNCTIONS
 
 =head2 new( $config_hash )
 
 Constructor. Expects a hash reference with all the configuration under the
-section I<< <SimpleLDAP> >> in the C<$Config{InstallScript}/squid-auth-engine> as
-parameter. Returns a plugin instance.
+section I<< <SimpleLDAP> >> in the C<$Config{InstallScript}/squid-auth-engine> 
+as parameter. Returns a plugin instance.
 
 =cut
 
 sub new {
-	my ( $class, $config ) = @_;
-	foreach $_ qw(server basedn binddn bindpw) {
-		croak "$/Missing config parameter \'" . $_ . "'"
-		  unless $config->{$_};
-	}
-	return unless UNIVERSAL::isa( $config, 'HASH' );
-	return bless { _config => $config }, $class;
+    my ( $class, $config ) = @_;
+
+    return unless UNIVERSAL::isa( $config, 'HASH' );
+    return bless { _cfg => $config }, $class;
 }
 
 =head2 initialize()
 
+Initialization method called upon instantiation. This provides an opportunity 
+for the plugin initialize itself, stablish database connections and ensure it 
+have all the necessary resources to verify the credentials presented. It 
+receives no parameters and expect no return values.
+
 =cut
 
 sub initialize {
-	my $self = shift;
-	$self->{_config}{userattr} = 'cn' unless $self->{_config}{userattr};
-	$self->{_config}{passattr} = 'userPassword'
-	  unless $self->{_config}{passattr};
-	$self->{_config}{objclass} = 'person' unless $self->{_config}{objclass};
+    my $self = shift;
 
-	return;
+    # some reasonable defaults
+    $self->{_cfg}{userattr} = 'cn' unless $self->{_cfg}{userattr};
+    $self->{_cfg}{passattr} = 'userPassword'
+      unless $self->{_cfg}{passattr};
+    $self->{_cfg}{objclass} = 'person' unless $self->{_cfg}{objclass};
+
+    # required information
+    foreach $_ qw(binddn bindpw basedn server) {
+        croak "$/Missing config parameter \'" . $_ . "'" unless $config->{$_};
+    }
+
+    # connect
+    $self->{ldap} = Net::LDAP->new( $self->{_cfg}{server}, $self->{_cfg}{net_ldap_options} )
+      || croak "Cannot connect to LDAP server: " . $self->{_cfg}{server};
+
+    # bind
+    my $mesg = $self->{ldap}->bind( "$self->{_cfg}{binddn}",
+        password => "$self->{_cfg}{bindpw}" );
+    $mesg->code && croak "Error binding to LDAP server: " . $mesg->error;
+
+    return;
 }
 
-=head2 _search
+=head2 _search()
 
 Searches the LDAP server. It expects one parameter with a search string for the username.
 The search string must conform with the format used in LDAP queries, as defined in section 3
@@ -96,50 +126,40 @@ of RFC 4515.
 =cut
 
 sub _search {
-	my ( $self, $search ) = @_;
+    my ( $self, $search ) = @_;
 
-	# connect
-	my $ldap = Net::LDAP->new( $self->{_config}{server} )
-	  || croak "Cannot connect to LDAP server: " . $self->{_config}{server};
+    # search
+    my $mesg = $self->{ldap}->search(
+        base   => "$self->{_cfg}{basedn}",
+        scope  => 'sub',
+        filter => '(&(objectClass='
+          . $self->{_cfg}{objclass} . ')('
+          . $self->{_cfg}{userattr} . '='
+          . "$search" . '))',
+        attrs => [ $self->{_cfg}{userattr}, $self->{_cfg}{passattr} ],
+    );
 
-	# bind
-	my $mesg = $ldap->bind( "$self->{_config}{binddn}",
-		password => "$self->{_config}{bindpw}" );
-	$mesg->code && croak "Error binding to LDAP server: " . $mesg->error;
+    # if errors
+    if ( $mesg->code ) {
+        $mesg = $self->{ldap}->unbind;
+        $mesg->code && croak "Error searching LDAP server: " . $mesg->error;
+    }
 
-	# search
-	$mesg = $ldap->search(
-		base   => "$self->{_config}{basedn}",
-		scope  => 'sub',
-		filter => '(&(objectClass='
-		  . $self->{_config}{objclass} . ')('
-		  . $self->{_config}{userattr} . '='
-		  . "$search" . '))',
-		attrs => [ $self->{_config}{userattr}, $self->{_config}{passattr} ]
-	);
+    # get results
+    my @entries = $mesg->entries();
+    my $result = {};
 
-	# if errors
-	if ( $mesg->code ) {
-		$mesg = $ldap->unbind;
-		$mesg->code && croak "Error searching LDAP server:" . $mesg->error;
-	}
+    my $entry = shift @entries;
+    return $result unless $entry;
 
-	# get results
-	my $entry;
-	my %result;
-	foreach $entry ( $mesg->entries() ) {
-		my $user = $entry->get_value( $self->{_config}{userattr} );
-		my $pw   = $entry->get_value( $self->{_config}{passattr} );
+    my $user = $entry->get_value( $self->{_cfg}{userattr} );
+    my $pw   = $entry->get_value( $self->{_cfg}{passattr} );
 
-		$result{$user} = ${pw};
+    $result->{$user} = ${pw};
 
-		undef $user;
-		undef $pw;
-	}
-	$mesg = $ldap->unbind;
-	$mesg->code && croak $mesg->error;
+    carp "Found more than 1 entry for user ($user)" if shift @entries;
 
-	return %result;
+    return $result;
 }
 
 =head2 is_valid( $username, $password )
@@ -151,11 +171,11 @@ as parameters and returns a boolean indicating if the credentials are valid
 =cut
 
 sub is_valid {
-	my ( $self, $username, $password ) = @_;
-	my %result = $self->_search("$username");
-	return 0 unless exists $result{$username};
+    my ( $self, $username, $password ) = @_;
+    my $result = $self->_search("$username");
+    return 0 unless exists $result->{$username};
 
-	return $result{$username} eq $password;
+    return $result->{$username} eq $password;
 }
 
 =head1 AUTHOR
@@ -164,16 +184,26 @@ Alexei Znamensky, C<< <russoz at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-net-squid-auth-plugin-simpleldap at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Squid-Auth-Plugin-SimpleLDAP>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
+Please report any bugs or feature requests to 
+C<bug-net-squid-auth-plugin-simpleldap at rt.cpan.org>, or through 
+the web interface at 
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Squid-Auth-Plugin-SimpleLDAP>.  
+I will be notified, and then you'll automatically be notified of progress on 
+your bug as I make changes.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Net::Squid::Auth::Plugin::SimpleLDAP
+
+Or take a look at the github site to be up to date:
+
+=over 4
+
+L<http://russoz.github.com/Net-Squid-Auth-Plugin-SimpleLDAP>
+
+=back
 
 You can also look for information at:
 
@@ -205,21 +235,29 @@ L<http://search.cpan.org/dist/Net-Squid-Auth-Plugin-SimpleLDAP>
 
 =back
 
+=head1 SEE ALSO
+
+L<Net::Squid::Auth::Engine>, L<Net::LDAP>
 
 =head1 ACKNOWLEDGEMENTS
 
-Luis "Fields" Motta Campos, who can now say:
+Luis "Fields" Motta Campos C<< <lmc at cpan.org> >>, who could now say:
 
 "The circle is now complete. When I left you, I was but the learner; now *I* am the master."
 
+To what I'd reply:
+
+"Only a master of Perl, Fields"
+
+
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 Alexei Znamensky, all rights reserved.
+Copyright 2008,2010 Alexei Znamensky, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-
 =cut
 
-1;    # End of Net::Squid::Auth::Plugin::SimpleLDAP
+42;    # End of Net::Squid::Auth::Plugin::SimpleLDAP
+
