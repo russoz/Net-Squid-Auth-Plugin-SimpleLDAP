@@ -11,7 +11,7 @@ Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials validatio
 
 =head1 VERSION
 
-Version 0.01.05
+Version 0.01.06
 
 =cut
 
@@ -31,7 +31,7 @@ On C<$Config{InstallScript}/squid-auth-engine>'s configuration file:
     server = myldap.server.somewhere       # mandatory
 
     # connection options
-    <NetLDAP>                     # optional section with
+    <NetLDAP>                              # optional section with
       port = N                             #   Net::LDAP's
       scheme = 'ldap' | 'ldaps' | 'ldapi'  #     constructor
       ...                                  #     options
