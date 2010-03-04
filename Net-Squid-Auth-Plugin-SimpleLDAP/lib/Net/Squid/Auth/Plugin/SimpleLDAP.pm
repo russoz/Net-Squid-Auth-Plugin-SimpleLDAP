@@ -101,16 +101,19 @@ sub initialize {
 
     # required information
     foreach my $_ qw(binddn bindpw basedn server) {
-        croak "$/Missing config parameter \'" . $_ . "'" unless $self->{_cfg}{$_};
+        croak "$/Missing config parameter \'" . $_ . "'"
+          unless $self->{_cfg}{$_};
     }
 
     # connect
-    $self->{ldap} = Net::LDAP->new( $self->{_cfg}{server}, $self->{_cfg}{net_ldap_options} )
+    $self->{ldap} =
+      Net::LDAP->new( $self->{_cfg}{server}, $self->{_cfg}{net_ldap_options} )
       || croak "Cannot connect to LDAP server: " . $self->{_cfg}{server};
 
     # bind
-    my $mesg = $self->{ldap}->bind( "$self->{_cfg}{binddn}",
-        password => "$self->{_cfg}{bindpw}" );
+    my $mesg =
+      $self->{ldap}
+      ->bind( "$self->{_cfg}{binddn}", password => "$self->{_cfg}{bindpw}" );
     $mesg->code && croak "Error binding to LDAP server: " . $mesg->error;
 
     return;
@@ -146,7 +149,7 @@ sub _search {
 
     # get results
     my @entries = $mesg->entries();
-    my $result = {};
+    my $result  = {};
 
     my $entry = shift @entries;
     return $result unless $entry;
