@@ -1,5 +1,11 @@
 Revision history for Net-Squid-Auth-Plugin-SimpleLDAP
 
+0.1.9   04.03.2010
+        45f857a Added messages and error handling to mkdist
+        229719a Fixed mkdist to properly hold the new files
+        21fa5a6 Removed old Module::Install stuff. Long live Module::Build!
+        62fb076 mkdist did not added the updated Changes file
+
 0.1.8   04.03.2010
         0b2a3d7 mkdist script is now ready for use
         0418c7d Fixed github URL in Changes
