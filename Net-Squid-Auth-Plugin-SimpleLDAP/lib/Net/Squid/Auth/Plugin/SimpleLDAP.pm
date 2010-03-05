@@ -11,11 +11,11 @@ Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials validatio
 
 =head1 VERSION
 
-Version 0.01.06
+Version 0.0108
 
 =cut
 
-use version; our $VERSION = qv('0.01.06');
+use version; our $VERSION = qv('0.0108');
 
 =head1 SYNOPSIS
 
@@ -77,6 +77,18 @@ as parameter. Returns a plugin instance.
 sub new {
     my ( $class, $config ) = @_;
 
+    # some reasonable defaults
+    $config->{userattr} = 'cn' unless $config->{userattr};
+    $config->{passattr} = 'userPassword'
+      unless $config->{passattr};
+    $config->{objclass} = 'person' unless $config->{objclass};
+
+    # required information
+    foreach my $_ qw(binddn bindpw basedn server) {
+        croak "$/Missing config parameter \'" . $_ . "'"
+          unless $config->{$_};
+    }
+
     return unless UNIVERSAL::isa( $config, 'HASH' );
     return bless { _cfg => $config }, $class;
 }
@@ -92,18 +104,6 @@ receives no parameters and expect no return values.
 
 sub initialize {
     my $self = shift;
-
-    # some reasonable defaults
-    $self->{_cfg}{userattr} = 'cn' unless $self->{_cfg}{userattr};
-    $self->{_cfg}{passattr} = 'userPassword'
-      unless $self->{_cfg}{passattr};
-    $self->{_cfg}{objclass} = 'person' unless $self->{_cfg}{objclass};
-
-    # required information
-    foreach my $_ qw(binddn bindpw basedn server) {
-        croak "$/Missing config parameter \'" . $_ . "'"
-          unless $self->{_cfg}{$_};
-    }
 
     # connect
     $self->{ldap} =

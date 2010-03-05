@@ -7,11 +7,8 @@ use Net::Squid::Auth::Plugin::SimpleLDAP;
 sub check_failure {
   my $param = shift;
 
-  my $p = Net::Squid::Auth::Plugin::SimpleLDAP->new( $param );
-  return 0 unless $p;
-
-  eval { $p->initialize() };
-  ok( $@,  );
+  my $p = eval { Net::Squid::Auth::Plugin::SimpleLDAP->new( $param ) };
+  ok( not $p );
 }
 
 check_failure( { } );
