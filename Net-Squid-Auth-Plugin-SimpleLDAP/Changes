@@ -1,5 +1,11 @@
 Revision history for Net-Squid-Auth-Plugin-SimpleLDAP
 
+0.1.10  04.03.2010
+        8affd80 Dry-run mode by default. Use -f to force. Adding module to git too.
+        7ad5af7 Small fix in the -n code
+        a294da4 Better messages. Added a '-n' switch for dry-run.
+        1731432 Removed Module::Install stuff from git
+
 0.1.9   04.03.2010
         45f857a Added messages and error handling to mkdist
         229719a Fixed mkdist to properly hold the new files
