@@ -1,15 +1,23 @@
-# Generate Changes automagically:
-#
-# use git log --oneline
-#   how to specify the time stamp :-o)
-#
-
 # Make README
-( cd lib; perldoc -t -F Net/Squid/Auth/Plugin/SimpleLDAP.pm > ../README )
+( cd lib; perldoc -t -F Net/Squid/Auth/Plugin/SimpleLDAP.pm > ../README ) 
 git add README
 
-perl ./Build.PL && ./Build dist
+perl ./Build.PL && ./Build dist && 
+  mv Net-Squid-Auth-Plugin-SimpleLDAP*.tar.gz ${HOME}
 
 version=$(perl -nle 'if( /^version/ ) { s/^\S+\s+//; print; }' META.yml)
 git add META.yml
+
+# Generate Changes automagically:
+cp Changes __changes && {
+    echo "Revision history for Net-Squid-Auth-Plugin-SimpleLDAP"
+    echo ""
+    v=$(echo $version | sed -e 's/^v//') 
+    printf '%-7s %s\n' "$v" "$(date +%d.%m.%Y)"
+    git log --oneline | perl -nle 'next if /DIST VERSION '"$version"'/; exit if /DIST VERSION/; print "        $_";' &&
+    echo "" &&
+    cat __changes | perl -e '$a=<>; $a=<>; while(<>) { print }'
+} > Changes
+
 git commit -m "DIST VERSION $version"
+git clean -fd
