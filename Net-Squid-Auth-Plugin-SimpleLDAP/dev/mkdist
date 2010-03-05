@@ -2,8 +2,7 @@
 ( cd lib; perldoc -t -F Net/Squid/Auth/Plugin/SimpleLDAP.pm > ../README ) 
 git add README
 
-perl ./Build.PL && ./Build dist && 
-  mv Net-Squid-Auth-Plugin-SimpleLDAP*.tar.gz ${HOME}
+perl ./Build.PL && ./Build distmeta
 
 version=$(perl -nle 'if( /^version/ ) { s/^\S+\s+//; print; }' META.yml)
 git add META.yml
@@ -18,6 +17,10 @@ cp Changes __changes && {
     echo "" &&
     cat __changes | perl -e '$a=<>; $a=<>; while(<>) { print }'
 } > Changes
+git add Changes
 
 git commit -m "DIST VERSION $version"
+
+./Build dist && mv Net-Squid-Auth-Plugin-SimpleLDAP*.tar.gz ${HOME}
+
 git clean -fd
