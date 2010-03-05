@@ -8,20 +8,6 @@ Revision history for Net-Squid-Auth-Plugin-SimpleLDAP
         1731432 Removed Module::Install stuff from git
 
 0.1.10  04.03.2010
-        06ea3cf Added TODO file to MANIFEST
-        8affd80 Dry-run mode by default. Use -f to force. Adding module to git too.
-        7ad5af7 Small fix in the -n code
-        a294da4 Better messages. Added a '-n' switch for dry-run.
-        1731432 Removed Module::Install stuff from git
-
-0.1.10  04.03.2010
-        06ea3cf Added TODO file to MANIFEST
-        8affd80 Dry-run mode by default. Use -f to force. Adding module to git too.
-        7ad5af7 Small fix in the -n code
-        a294da4 Better messages. Added a '-n' switch for dry-run.
-        1731432 Removed Module::Install stuff from git
-
-0.1.10  04.03.2010
         8affd80 Dry-run mode by default. Use -f to force. Adding module to git too.
         7ad5af7 Small fix in the -n code
         a294da4 Better messages. Added a '-n' switch for dry-run.
