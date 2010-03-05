@@ -41,8 +41,8 @@ is_dry_run && changes=/dev/tty
 cp Changes __changes && {
     echo "Revision history for Net-Squid-Auth-Plugin-SimpleLDAP"
     echo ""
-    printf '%-7s %s\n' "$version" "$(date +%d.%m.%Y)"
-    git log --oneline | perl -nle 'next if /DIST VERSION '"$version"'/; exit if /DIST VERSION/; print "        $_";' &&
+    printf '%-7s %s\n' "$version" "$(date +%d.%m.%Y) DIST VERSION $version"
+    git log --oneline | perl -nle 'next if /DIST VERSION '"$version"'/; exit if /DIST VERSION/; print "           $_";' &&
     echo "" &&
     cat __changes | perl -e '$a=<>; $a=<>; while(<>) { print }'
 } > $changes \
