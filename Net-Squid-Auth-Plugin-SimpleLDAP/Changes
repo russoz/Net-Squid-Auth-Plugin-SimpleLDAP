@@ -11,7 +11,7 @@ Revision history for Net-Squid-Auth-Plugin-SimpleLDAP
 
 0.01.04 03.03.2010
         Moved to github. See more at:
-        http://github.com/russoz/Net--Squid--Auth--Plugin--SimpleLDAP
+        http://github.com/russoz/Net-Squid-Auth-Plugin-SimpleLDAP
         Updated README.
         Added more perldoc lines.
         Moved to Module::Build.
