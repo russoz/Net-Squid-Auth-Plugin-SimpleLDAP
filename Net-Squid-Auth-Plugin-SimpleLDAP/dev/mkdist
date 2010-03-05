@@ -28,6 +28,10 @@ version=$(perl -nle 'if( /^version/ ) { s/^\S+\s+v//; print; }' META.yml)
 msg "== Version: $version"
 
 msg "== Generating <Changes> automagically"
+grep -q "^$version" Changes && {
+  msg "**** VERSION $version is already in Changes. Aborting..."
+  exit 1
+}
 changes=Changes
 [ "$dry_run" -eq 1 ] && changes=/dev/tty
 cp Changes __changes && {
@@ -39,7 +43,10 @@ cp Changes __changes && {
     cat __changes | perl -e '$a=<>; $a=<>; while(<>) { print }'
 } > $changes \
   || exit 1
-[ "$dry_run" -eq 0 ] && git add Changes
+[ "$dry_run" -eq 0 ] && {
+  head -20 Changes
+  git add Changes
+}
 
 msg "== Committing files to git"
 [ "$dry_run" -eq 0 ] && { git commit -m "DIST VERSION $version" || exit 1; }
