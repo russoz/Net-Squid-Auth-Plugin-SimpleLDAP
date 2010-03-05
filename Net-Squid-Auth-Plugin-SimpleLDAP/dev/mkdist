@@ -1,26 +1,46 @@
-# Make README
-( cd lib; perldoc -t -F Net/Squid/Auth/Plugin/SimpleLDAP.pm > ../README ) 
+#!/bin/bash
+
+msg() {
+  echo "$@" >&2
+}
+
+msg "Make README"
+( cd lib; perldoc -t -F Net/Squid/Auth/Plugin/SimpleLDAP.pm > ../README ) \
+  || exit 1
 git add README
 
-perl ./Build.PL && ./Build distmeta
+msg "Running ./Build.PL"
+perl ./Build.PL || exit 1
 
-version=$(perl -nle 'if( /^version/ ) { s/^\S+\s+//; print; }' META.yml)
+msg "Creating META.yml"
+./Build distmeta || exit 1
 git add META.yml
 
-# Generate Changes automagically:
+version=$(perl -nle 'if( /^version/ ) { s/^\S+\s+v//; print; }' META.yml)
+msg "Version: $version"
+
+msg "Generating <Changes> automagically"
 cp Changes __changes && {
     echo "Revision history for Net-Squid-Auth-Plugin-SimpleLDAP"
     echo ""
-    v=$(echo $version | sed -e 's/^v//') 
-    printf '%-7s %s\n' "$v" "$(date +%d.%m.%Y)"
+    printf '%-7s %s\n' "$version" "$(date +%d.%m.%Y)"
     git log --oneline | perl -nle 'next if /DIST VERSION '"$version"'/; exit if /DIST VERSION/; print "        $_";' &&
     echo "" &&
     cat __changes | perl -e '$a=<>; $a=<>; while(<>) { print }'
-} > Changes
+} > Changes \
+  || exit 1
 git add Changes
 
+msg "Committing files to git"
 git commit -m "DIST VERSION $version"
 
-./Build dist && mv Net-Squid-Auth-Plugin-SimpleLDAP*.tar.gz ${HOME}
+msg "Making distribution package"
+./Build dist || exit 1
 
+d=$(echo Net-Squid-Auth-Plugin-SimpleLDAP*.tar.gz) 
+msg "Moving file $d to home directory"
+mv $d ${HOME}
+
+msg "Cleaning directory"
 git clean -fd
+
