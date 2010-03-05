@@ -157,7 +157,7 @@ sub _search {
     my $user = $entry->get_value( $self->{_cfg}{userattr} );
     my $pw   = $entry->get_value( $self->{_cfg}{passattr} );
 
-    $result->{$user} = ${pw};
+    $result->{$user} = $pw;
 
     carp "Found more than 1 entry for user ($user)" if shift @entries;
 
