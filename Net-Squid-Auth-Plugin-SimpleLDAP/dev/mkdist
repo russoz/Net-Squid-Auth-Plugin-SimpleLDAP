@@ -1,11 +1,14 @@
 #!/bin/bash
 
-dry_run=0
-[ "$1" = "-n" ] && dry_run=1
+dry_run=1
+[ "$1" = "-f" ] && dry_run=0
 
 msg() {
   echo "$@" >&2
 }
+
+msg "== Adding module to git"
+[ "$dry_run" -eq 0 ] && git add lib/Net/Squid/Auth/Plugin/SimpleLDAP.pm
 
 msg "== Making README"
 ( readme=../README
