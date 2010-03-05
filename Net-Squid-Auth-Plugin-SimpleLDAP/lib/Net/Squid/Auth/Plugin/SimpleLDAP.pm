@@ -11,11 +11,11 @@ Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials validatio
 
 =head1 VERSION
 
-Version 0.1.11
+Version 0.1.12
 
 =cut
 
-use version; our $VERSION = qv('0.1.11');
+use version; our $VERSION = qv('0.1.12');
 
 =head1 SYNOPSIS
 
