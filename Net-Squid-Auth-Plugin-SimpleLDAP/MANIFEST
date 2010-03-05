@@ -4,6 +4,7 @@ lib/Net/Squid/Auth/Plugin/SimpleLDAP.pm
 MANIFEST
 META.yml
 README
+TODO
 t/00-load.t
 t/01-basic.t
 t/02-param.t
