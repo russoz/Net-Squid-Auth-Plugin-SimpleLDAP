@@ -203,7 +203,7 @@ Or take a look at the github site to be up to date:
 
 =over 4
 
-L<http://russoz.github.com/Net-Squid-Auth-Plugin-SimpleLDAP>
+L<http://github.com/russoz/Net-Squid-Auth-Plugin-SimpleLDAP>
 
 =back
 
