@@ -84,9 +84,9 @@ sub new {
     $config->{objclass} = 'person' unless $config->{objclass};
 
     # required information
-    foreach my $_ qw(binddn bindpw basedn server) {
-        croak "$/Missing config parameter \'" . $_ . "'"
-          unless $config->{$_};
+    foreach my $required qw(binddn bindpw basedn server) {
+        croak "$/Missing config parameter \'" . $required . "'"
+          unless $config->{$required};
     }
 
     return unless UNIVERSAL::isa( $config, 'HASH' );
@@ -121,9 +121,9 @@ sub initialize {
 
 =head2 _search()
 
-Searches the LDAP server. It expects one parameter with a search string for the username.
-The search string must conform with the format used in LDAP queries, as defined in section 3
-of RFC 4515.
+Searches the LDAP server. It expects one parameter with a search string for
+the username. The search string must conform with the format used in LDAP
+queries, as defined in section 3 of RFC 4515.
 
 =cut
 
