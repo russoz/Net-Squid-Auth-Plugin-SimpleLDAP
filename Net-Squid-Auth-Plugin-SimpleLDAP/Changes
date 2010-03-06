@@ -1,5 +1,19 @@
 Revision history for Net-Squid-Auth-Plugin-SimpleLDAP
 
+0.1.13  06.03.2010 DIST VERSION 0.1.13
+bf1c0b8 mkdist: Changed format of output into Changes file.
+e85a02a Created accessor method config(). Changed code to use it.
+7067349 Added perltidy to mkdist. Trimmed unnecessary check in git log output.
+791e6a1 Removed META.yml again. Fixed mkdist, so it won't come back.
+91eddfd No longer using "my $_" due to older versions of perl
+425105e Not adding META.yml to git
+ff83008 The Perl Critic test was poorly written.
+6d8be1c Fixed the github URL.
+3a0db0d Yet more candy on dev/mkdist. Should I make a module out of it?
+988be4d No need to keep version of this build-generated file
+4d0fb8b Candy candy I won't let you go..
+06ebfd9 This is perl, son, not bash.
+
 0.1.12  04.03.2010
         be56c30 Not allowing the same version to be commited twice. Printing first 20 lines of Changes.
 

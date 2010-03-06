@@ -3,7 +3,7 @@ NAME
     validation plugin for Net::Squid::Auth::Engine
 
 VERSION
-    Version 0.1.12
+    Version 0.1.13
 
 SYNOPSIS
     If you're a system administrator trying to use Net::Squid::Auth::Engine
@@ -76,6 +76,9 @@ FUNCTIONS
     credentials are valid (i.e., are listed in the configuration file) or
     not.
 
+  config( $key )
+    Accessor for a configuration setting given by key.
+
 AUTHOR
     Alexei Znamensky, "<russoz at cpan.org>"
 
@@ -94,7 +97,7 @@ SUPPORT
 
     Or take a look at the github site to be up to date:
 
-        <http://russoz.github.com/Net-Squid-Auth-Plugin-SimpleLDAP>
+        <http://github.com/russoz/Net-Squid-Auth-Plugin-SimpleLDAP>
 
     You can also look for information at:
 
