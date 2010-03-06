@@ -26,7 +26,6 @@ perl ./Build.PL || exit 1
 
 msg "== Creating META.yml"
 ./Build distmeta || exit 1
-is_dry_run || git add META.yml
 
 version=$(perl -nle 'if( /^version/ ) { s/^\S+\s+v//; print; }' META.yml)
 msg "== Version: $version"
