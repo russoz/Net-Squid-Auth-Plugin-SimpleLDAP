@@ -44,7 +44,7 @@ cp Changes __changes && {
     echo "Revision history for Net-Squid-Auth-Plugin-SimpleLDAP"
     echo ""
     printf '%-7s %s\n' "$version" "$(date +%d.%m.%Y) DIST VERSION $version"
-    git log --oneline | perl -nle 'exit if /DIST VERSION/; print "           $_";' &&
+    git log --oneline | perl -nle 'exit if /DIST VERSION/; print "$_";' &&
     echo "" &&
     cat __changes | perl -e '$a=<>; $a=<>; while(<>) { print }'
 } > $changes \
