@@ -107,13 +107,13 @@ sub initialize {
 
     # connect
     $self->{ldap} =
-      Net::LDAP->new( $self->{_cfg}{server}, $self->{_cfg}{NetLDAP} )
-      || croak "Cannot connect to LDAP server: " . $self->{_cfg}{server};
+         Net::LDAP->new( $self->config('server'), $self->config('NetLDAP') )
+      || croak "Cannot connect to LDAP server: " . $self->config()->{server};
 
     # bind
     my $mesg =
       $self->{ldap}
-      ->bind( "$self->{_cfg}{binddn}", password => "$self->{_cfg}{bindpw}" );
+      ->bind( $self->config('binddn'), password => $self->config('bindpw') );
     $mesg->code && croak "Error binding to LDAP server: " . $mesg->error;
 
     return;
@@ -132,13 +132,13 @@ sub _search {
 
     # search
     my $mesg = $self->{ldap}->search(
-        base   => "$self->{_cfg}{basedn}",
+        base   => $self->config('basedn'),
         scope  => 'sub',
         filter => '(&(objectClass='
-          . $self->{_cfg}{objclass} . ')('
-          . $self->{_cfg}{userattr} . '='
+          . $self->config('objclass') . ')('
+          . $self->config('userattr') . '='
           . "$search" . '))',
-        attrs => [ $self->{_cfg}{userattr}, $self->{_cfg}{passattr} ],
+        attrs => [ $self->config('userattr'), $self->config('passattr') ],
     );
 
     # if errors
@@ -154,8 +154,8 @@ sub _search {
     my $entry = shift @entries;
     return $result unless $entry;
 
-    my $user = $entry->get_value( $self->{_cfg}{userattr} );
-    my $pw   = $entry->get_value( $self->{_cfg}{passattr} );
+    my $user = $entry->get_value( $self->config('userattr') );
+    my $pw   = $entry->get_value( $self->config('passattr') );
 
     $result->{$user} = $pw;
 
@@ -178,6 +178,18 @@ sub is_valid {
     return 0 unless exists $result->{$username};
 
     return $result->{$username} eq $password;
+}
+
+=head2 config( $key )
+
+Accessor for a configuration setting given by key.
+
+=cut
+
+sub config {
+    my ( $self, $key ) = @_;
+
+    return $self->{_cfg}->{$key};
 }
 
 =head1 AUTHOR
