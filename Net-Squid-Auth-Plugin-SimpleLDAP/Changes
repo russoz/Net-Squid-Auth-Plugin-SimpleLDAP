@@ -1,5 +1,8 @@
 Revision history for Net-Squid-Auth-Plugin-SimpleLDAP
 
+0.1.14  10.03.2010 DIST VERSION 0.1.14
+e9d43af Just run t/perlcritic.t if Russoz is in the house!
+
 0.1.13  06.03.2010 DIST VERSION 0.1.13
 bf1c0b8 mkdist: Changed format of output into Changes file.
 e85a02a Created accessor method config(). Changed code to use it.
