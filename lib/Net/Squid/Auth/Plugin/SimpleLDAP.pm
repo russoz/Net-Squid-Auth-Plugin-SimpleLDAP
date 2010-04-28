@@ -77,6 +77,8 @@ as parameter. Returns a plugin instance.
 sub new {
     my ( $class, $config ) = @_;
 
+    return unless UNIVERSAL::isa( $config, 'HASH' );
+
     # some reasonable defaults
     $config->{userattr} = 'cn' unless $config->{userattr};
     $config->{passattr} = 'userPassword'
@@ -89,7 +91,6 @@ sub new {
           unless $config->{$required};
     }
 
-    return unless UNIVERSAL::isa( $config, 'HASH' );
     return bless { _cfg => $config }, $class;
 }
 

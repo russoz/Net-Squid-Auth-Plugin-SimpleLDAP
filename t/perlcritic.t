@@ -1,8 +1,6 @@
 #!perl
 
-
 use Test::More ;
-
 
 SKIP: {
     skip "Author tests aren't required to install this module", 1
