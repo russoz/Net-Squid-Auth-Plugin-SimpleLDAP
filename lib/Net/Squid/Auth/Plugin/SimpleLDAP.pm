@@ -11,11 +11,11 @@ Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials validatio
 
 =head1 VERSION
 
-Version 0.1.14
+Version 0.1.15
 
 =cut
 
-use version; our $VERSION = qv('0.1.14');
+use version; our $VERSION = qv('0.1.15');
 
 =head1 SYNOPSIS
 
@@ -155,8 +155,14 @@ sub _search {
     my $entry = shift @entries;
     return $result unless $entry;
 
-    my $user = $entry->get_value( $self->config('userattr') );
-    my $pw   = $entry->get_value( $self->config('passattr') );
+    my $user;
+    if ( $self->config('userattr') =~ m/dn/i ) {
+        $user = $entry->dn();
+    }
+    else {
+        $user = $entry->get_value( $self->config('userattr') );
+    }
+    my $pw = $entry->get_value( $self->config('passattr') );
 
     $result->{$user} = $pw;
 
