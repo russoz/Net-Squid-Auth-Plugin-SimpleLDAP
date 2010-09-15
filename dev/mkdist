@@ -72,3 +72,7 @@ is_dry_run || mv $d ${HOME}
 msg "== Cleaning directory"
 is_dry_run || git clean -fd
 
+is_dry_run && {
+    msg "***** DRY-RUN: use -f to actually commit! *****"
+}
+
