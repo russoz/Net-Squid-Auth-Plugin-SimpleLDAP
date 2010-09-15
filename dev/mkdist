@@ -68,6 +68,7 @@ msg "== Making distribution package"
 d=$(echo Net-Squid-Auth-Plugin-SimpleLDAP*.tar.gz) 
 msg "== Moving file $d to home directory"
 is_dry_run || mv $d ${HOME}
+msg "${HOME}/$d"
 
 msg "== Cleaning directory"
 is_dry_run || git clean -fd
