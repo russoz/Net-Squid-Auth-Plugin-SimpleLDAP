@@ -1,5 +1,13 @@
 Revision history for Net-Squid-Auth-Plugin-SimpleLDAP
 
+0.1.15  15.09.2010 DIST VERSION 0.1.15
+======= ======================================================================
+e5d7881 Added dry-run notice to the end of the script
+ea5498d Eye candy in the Changelog generation
+af59f77 Fixed the case where the user attribute is the DN
+a61db8b More reasonable parameter checking in new()
+1f70681 Reduced one-level in the directory tree
+
 0.1.14  10.03.2010 DIST VERSION 0.1.14
 e9d43af Just run t/perlcritic.t if Russoz is in the house!
 

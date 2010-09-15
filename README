@@ -3,7 +3,7 @@ NAME
     validation plugin for Net::Squid::Auth::Engine
 
 VERSION
-    Version 0.1.14
+    Version 0.1.15
 
 SYNOPSIS
     If you're a system administrator trying to use Net::Squid::Auth::Engine
