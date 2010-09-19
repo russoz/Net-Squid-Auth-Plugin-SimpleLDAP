@@ -51,7 +51,9 @@ On C<$Config{InstallScript}/squid-auth-engine>'s configuration file:
 Unless configured otherwise, this module will assume the users in your LDAP 
 directory belong to the object class C<person>, as defined in section 3.12 of 
 RFC 4519, and the B<user> and B<password> information will be looked for in the 
-C<cn> and C<userPassword> attributes, respectively.
+C<cn> and C<userPassword> attributes, respectively. Although you can choose
+to use any other pair of attributes, the C<userattr> can be set to C<DN>,
+while the C<passattr> can not.
 
 On your Squid HTTP Cache configuration:
 
