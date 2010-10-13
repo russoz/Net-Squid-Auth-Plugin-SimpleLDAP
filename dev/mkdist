@@ -1,5 +1,9 @@
 #!/bin/bash
 
+modulename='Net::Squid::Auth::Plugin::SimpleLDAP'
+modulepath=$(echo $modulename | sed -e 's/::/\//g').pm
+moduledash=$(echo $modulename | sed -e 's/::/-/g')
+
 dry_run=1
 [ "$1" = "-f" ] && dry_run=0
 
@@ -11,20 +15,29 @@ msg() {
   echo "$@" >&2
 }
 
+msg "== Checking current directory"
+[ -f ./lib/${modulepath} ] || {
+    msg "**** Cannot find ./lib/${modulepath}"
+    exit 1
+}
+
 is_dry_run && {
     msg "***** DRY-RUN: use -f to actually commit! *****"
 }
 
 msg "== Running through perltidy"
-perltidy -b lib/Net/Squid/Auth/Plugin/SimpleLDAP.pm
+perltidy -b lib/${modulepath} t/*.t || {
+    msg "**** Failed syntax check! Aborting."
+    exit 1
+}
 
 msg "== Adding module to git"
-is_dry_run || git add lib/Net/Squid/Auth/Plugin/SimpleLDAP.pm
+is_dry_run || git add lib/${modulepath}
 
 msg "== Making README"
 ( readme=../README
   is_dry_run && readme=/dev/null 
-  cd lib; perldoc -t -F Net/Squid/Auth/Plugin/SimpleLDAP.pm > $readme ) \
+  cd lib; perldoc -t -F ${modulepath} > $readme ) \
   || exit 1
 is_dry_run || git add README
 
@@ -45,9 +58,10 @@ grep -q "^$version" Changes && {
 changes=Changes
 is_dry_run && changes=/dev/tty
 cp Changes __changes && {
-    echo "Revision history for Net-Squid-Auth-Plugin-SimpleLDAP"
+    echo "Revision history for ${moduledash}"
     echo ""
-    printf '%-7s %s\n' "$version" "$(date +%d.%m.%Y) DIST VERSION $version"
+    printf '%-7s %s %s\n' "$version" "$(date +%d.%m.%Y)" \
+        "${modulename} DIST VERSION $version"
     perl -e 'print "="x7 . " " . "="x70 . "\n"'
     git log --oneline | perl -nle 'exit if /DIST VERSION/; print "$_";' &&
     echo "" &&
@@ -65,7 +79,7 @@ is_dry_run || { git commit -m "DIST VERSION $version" || exit 1; }
 msg "== Making distribution package"
 ./Build dist || exit 1
 
-d=$(echo Net-Squid-Auth-Plugin-SimpleLDAP*.tar.gz) 
+d=$(echo ${moduledash}*.tar.gz) 
 msg "== Moving file $d to home directory"
 is_dry_run || mv $d ${HOME}
 msg "${HOME}/$d"
