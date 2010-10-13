@@ -1,5 +1,11 @@
 Revision history for Net-Squid-Auth-Plugin-SimpleLDAP
 
+0.1.80  13.10.2010 Net::Squid::Auth::Plugin::SimpleLDAP DIST VERSION 0.1.80
+======= ======================================================================
+f21d056 improved mkdist
+d785e42 Run test through perltidy
+31d00d0 Improved documentation about using dn as user
+
 0.1.16  15.09.2010 DIST VERSION 0.1.16
 ======= ======================================================================
 02fd22b Messed up versions. Moving up to 0.0.16.

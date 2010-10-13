@@ -3,7 +3,7 @@ NAME
     validation plugin for Net::Squid::Auth::Engine
 
 VERSION
-    Version 0.1.16
+    Version 0.1.80
 
 SYNOPSIS
     If you're a system administrator trying to use Net::Squid::Auth::Engine
@@ -39,6 +39,8 @@ SYNOPSIS
     LDAP directory belong to the object class "person", as defined in
     section 3.12 of RFC 4519, and the user and password information will be
     looked for in the "cn" and "userPassword" attributes, respectively.
+    Although you can choose to use any other pair of attributes, the
+    "userattr" can be set to "DN", while the "passattr" can not.
 
     On your Squid HTTP Cache configuration:
 
