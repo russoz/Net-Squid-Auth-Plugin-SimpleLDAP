@@ -1,16 +1,18 @@
 #!perl -T
 
-use Test::More tests => 5;
+use Test::More tests => 8;
 
 use Net::Squid::Auth::Plugin::SimpleLDAP;
 
 sub check_failure {
-    my $param = shift;
-
-    my $p = eval { Net::Squid::Auth::Plugin::SimpleLDAP->new($param) };
-    ok( not $p );
+    my $p = shift;
+    eval { Net::Squid::Auth::Plugin::SimpleLDAP->new($p) };
+    ok($@);
 }
 
+check_failure();
+check_failure('yabadabadoo');
+check_failure( ['yabadabadoo'] );
 check_failure( {} );
 check_failure( { binddn => 1, bindpw => 2, basedn => 3 } );
 check_failure( { binddn => 1, bindpw => 2, server => 4 } );

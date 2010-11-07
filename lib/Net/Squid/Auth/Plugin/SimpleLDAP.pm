@@ -4,18 +4,15 @@ use warnings;
 use strict;
 use Carp;
 use Net::LDAP;
+use Scalar::Util qw/reftype/;
 
 =head1 NAME
 
 Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials validation plugin for Net::Squid::Auth::Engine
 
-=head1 VERSION
-
-Version 0.1.80
-
 =cut
 
-use version; our $VERSION = qv('0.1.80');
+use version; our $VERSION = qv('0.1.81');
 
 =head1 SYNOPSIS
 
@@ -79,7 +76,8 @@ as parameter. Returns a plugin instance.
 sub new {
     my ( $class, $config ) = @_;
 
-    return unless UNIVERSAL::isa( $config, 'HASH' );
+    my $reftype = reftype($config) // '';
+    croak 'Must pass a config hash' unless $reftype eq 'HASH';
 
     # some reasonable defaults
     $config->{userattr} = 'cn' unless $config->{userattr};
@@ -89,7 +87,7 @@ sub new {
 
     # required information
     foreach my $required qw(binddn bindpw basedn server) {
-        croak "$/Missing config parameter \'" . $required . "'"
+        croak qq{Missing config parameter '$required'}
           unless $config->{$required};
     }
 
@@ -260,7 +258,7 @@ L<http://search.cpan.org/dist/Net-Squid-Auth-Plugin-SimpleLDAP>
 
 =head1 SEE ALSO
 
-L<Net::Squid::Auth::Engine>, L<Net::LDAP>
+L<Net::Squid::Auth::Engine>, L<Net::LDAP>, L<Scalar::Util>
 
 =head1 ACKNOWLEDGEMENTS
 
