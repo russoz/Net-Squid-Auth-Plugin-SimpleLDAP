@@ -1,5 +1,13 @@
 Revision history for Net-Squid-Auth-Plugin-SimpleLDAP
 
+0.1.81  [2010.11.07 21:01:38] Net::Squid::Auth::Plugin::SimpleLDAP DIST VERSION 0.1.81
+======= ==============================================================================
+bb91025 added build files by mistake - removing now
+64ac94a using Scalar::Util to test for hash
+0361349 mkdist output formatting
+1d076c7 improved mkdist further still
+2f4305c Improved mkdist script
+
 0.1.80  13.10.2010 Net::Squid::Auth::Plugin::SimpleLDAP DIST VERSION 0.1.80
 ======= ======================================================================
 f21d056 improved mkdist

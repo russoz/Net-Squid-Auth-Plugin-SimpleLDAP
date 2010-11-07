@@ -2,9 +2,6 @@ NAME
     Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials
     validation plugin for Net::Squid::Auth::Engine
 
-VERSION
-    Version 0.1.80
-
 SYNOPSIS
     If you're a system administrator trying to use Net::Squid::Auth::Engine
     to validate your user's credentials using a LDAP server as a credentials
@@ -131,7 +128,7 @@ SUPPORT
         <http://search.cpan.org/dist/Net-Squid-Auth-Plugin-SimpleLDAP>
 
 SEE ALSO
-    Net::Squid::Auth::Engine, Net::LDAP
+    Net::Squid::Auth::Engine, Net::LDAP, Scalar::Util
 
 ACKNOWLEDGEMENTS
     Luis "Fields" Motta Campos "<lmc at cpan.org>", who could now say:
