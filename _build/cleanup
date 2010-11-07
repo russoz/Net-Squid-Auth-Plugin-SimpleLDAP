@@ -1,5 +1,0 @@
-do{ my $x = {
-       'Net-Squid-Auth-Plugin-SimpleLDAP-v0.1.81' => 1,
-       'Net-Squid-Auth-Plugin-SimpleLDAP-*' => 1
-     };
-$x; }
