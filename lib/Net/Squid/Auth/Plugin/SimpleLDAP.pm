@@ -12,7 +12,7 @@ Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials validatio
 
 =cut
 
-use version; our $VERSION = qv('0.1.81');
+use version; our $VERSION = qv('0.1.82');
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ as parameter. Returns a plugin instance.
 sub new {
     my ( $class, $config ) = @_;
 
-    my $reftype = reftype($config) // '';
+    my $reftype = reftype($config) || '';
     croak 'Must pass a config hash' unless $reftype eq 'HASH';
 
     # some reasonable defaults
