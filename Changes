@@ -1,5 +1,10 @@
 Revision history for Net-Squid-Auth-Plugin-SimpleLDAP
 
+0.1.82  [2010.11.08 07:45:43] Net::Squid::Auth::Plugin::SimpleLDAP DIST VERSION 0.1.82
+======= ==============================================================================
+1178eaa refrained from using op //. using plain || instead, and allowing older perls
+5549025 added build files by mistake - removing now
+
 0.1.81  [2010.11.07 21:01:38] Net::Squid::Auth::Plugin::SimpleLDAP DIST VERSION 0.1.81
 ======= ==============================================================================
 bb91025 added build files by mistake - removing now
