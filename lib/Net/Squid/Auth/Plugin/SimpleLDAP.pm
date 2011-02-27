@@ -1,4 +1,5 @@
 package Net::Squid::Auth::Plugin::SimpleLDAP;
+# ABSTRACT: A simple LDAP-based credentials validation plugin for Net::Squid::Auth::Engine
 
 use warnings;
 use strict;
@@ -6,13 +7,7 @@ use Carp;
 use Net::LDAP;
 use Scalar::Util qw/reftype/;
 
-=head1 NAME
-
-Net::Squid::Auth::Plugin::SimpleLDAP - A simple LDAP-based credentials validation plugin for Net::Squid::Auth::Engine
-
-=cut
-
-use version; our $VERSION = qv('0.1.82');
+# VERSION
 
 =head1 SYNOPSIS
 
@@ -45,9 +40,9 @@ On C<$Config{InstallScript}/squid-auth-engine>'s configuration file:
     passattr = password                    # opt, default "userPassword"
   </SimpleLDAP>
 
-Unless configured otherwise, this module will assume the users in your LDAP 
-directory belong to the object class C<person>, as defined in section 3.12 of 
-RFC 4519, and the B<user> and B<password> information will be looked for in the 
+Unless configured otherwise, this module will assume the users in your LDAP
+directory belong to the object class C<person>, as defined in section 3.12 of
+RFC 4519, and the B<user> and B<password> information will be looked for in the
 C<cn> and C<userPassword> attributes, respectively. Although you can choose
 to use any other pair of attributes, the C<userattr> can be set to C<DN>,
 while the C<passattr> can not.
@@ -61,14 +56,14 @@ And you're ready to use this module.
 If you're a developer, you might be interested in reading through the source
 code of this module, in order to learn about it's internals and how it works.
 It may give you ideas about how to implement other plugin modules for
-L<Net::Squid::Auth::Engine>. 
+L<Net::Squid::Auth::Engine>.
 
-=head1 FUNCTIONS
+=head1 METHODS
 
 =head2 new( $config_hash )
 
 Constructor. Expects a hash reference with all the configuration under the
-section I<< <SimpleLDAP> >> in the C<$Config{InstallScript}/squid-auth-engine> 
+section I<< <SimpleLDAP> >> in the C<$Config{InstallScript}/squid-auth-engine>
 as parameter. Returns a plugin instance.
 
 =cut
@@ -96,9 +91,9 @@ sub new {
 
 =head2 initialize()
 
-Initialization method called upon instantiation. This provides an opportunity 
-for the plugin initialize itself, stablish database connections and ensure it 
-have all the necessary resources to verify the credentials presented. It 
+Initialization method called upon instantiation. This provides an opportunity
+for the plugin initialize itself, stablish database connections and ensure it
+have all the necessary resources to verify the credentials presented. It
 receives no parameters and expect no return values.
 
 =cut
@@ -199,19 +194,6 @@ sub config {
     return $self->{_cfg}->{$key};
 }
 
-=head1 AUTHOR
-
-Alexei Znamensky, C<< <russoz at cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to 
-C<bug-net-squid-auth-plugin-simpleldap at rt.cpan.org>, or through 
-the web interface at 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Squid-Auth-Plugin-SimpleLDAP>.  
-I will be notified, and then you'll automatically be notified of progress on 
-your bug as I make changes.
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -270,15 +252,7 @@ To what I'd reply:
 
 "Only a master of Perl, Fields"
 
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008,2010 Alexei Znamensky, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
 =cut
 
-42;    # End of Net::Squid::Auth::Plugin::SimpleLDAP
+1;    # End of Net::Squid::Auth::Plugin::SimpleLDAP
 
