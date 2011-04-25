@@ -1,13 +1,116 @@
 package Net::Squid::Auth::Plugin::SimpleLDAP;
-# ABSTRACT: A simple LDAP-based credentials validation plugin for Net::Squid::Auth::Engine
 
 use warnings;
 use strict;
-use Carp;
-use Net::LDAP;
-use Scalar::Util qw/reftype/;
+
+# ABSTRACT: A simple LDAP-based credentials validation plugin for Net::Squid::Auth::Engine
 
 # VERSION
+
+use Carp;
+use Net::LDAP 0.4001;
+use Scalar::Util qw/reftype/;
+
+sub new {
+    my ( $class, $config ) = @_;
+
+    my $reftype = reftype($config) || '';
+    croak 'Must pass a config hash' unless $reftype eq 'HASH';
+
+    # some reasonable defaults
+    $config->{userattr} = 'cn' unless $config->{userattr};
+    $config->{passattr} = 'userPassword'
+      unless $config->{passattr};
+    $config->{objclass} = 'person' unless $config->{objclass};
+
+    # required information
+    foreach my $required qw(binddn bindpw basedn server) {
+        croak qq{Missing config parameter '$required'}
+          unless $config->{$required};
+    }
+
+    return bless { _cfg => $config }, $class;
+}
+
+sub initialize {
+    my $self = shift;
+
+    # connect
+    $self->{ldap} =
+         Net::LDAP->new( $self->config('server'), $self->config('NetLDAP') )
+      || croak "Cannot connect to LDAP server: " . $self->config()->{server};
+
+    # bind
+    my $mesg =
+      $self->{ldap}
+      ->bind( $self->config('binddn'), password => $self->config('bindpw') );
+    $mesg->code && croak "Error binding to LDAP server: " . $mesg->error;
+
+    return;
+}
+
+sub _search {
+    my ( $self, $search ) = @_;
+
+    # search
+    my $mesg = $self->{ldap}->search(
+        base   => $self->config('basedn'),
+        scope  => 'sub',
+        filter => '(&(objectClass='
+          . $self->config('objclass') . ')('
+          . $self->config('userattr') . '='
+          . "$search" . '))',
+        attrs => [ $self->config('userattr'), $self->config('passattr') ],
+    );
+
+    # if errors
+    if ( $mesg->code ) {
+        $mesg = $self->{ldap}->unbind;
+        $mesg->code && croak "Error searching LDAP server: " . $mesg->error;
+    }
+
+    # get results
+    my @entries = $mesg->entries();
+    my $result  = {};
+
+    my $entry = shift @entries;
+    return $result unless $entry;
+
+    my $user;
+    if ( $self->config('userattr') =~ m/dn/i ) {
+        $user = $entry->dn();
+    }
+    else {
+        $user = $entry->get_value( $self->config('userattr') );
+    }
+    my $pw = $entry->get_value( $self->config('passattr') );
+
+    $result->{$user} = $pw;
+
+    carp "Found more than 1 entry for user ($user)" if shift @entries;
+
+    return $result;
+}
+
+sub is_valid {
+    my ( $self, $username, $password ) = @_;
+    my $result = $self->_search("$username");
+    return 0 unless exists $result->{$username};
+
+    return $result->{$username} eq $password;
+}
+
+sub config {
+    my ( $self, $key ) = @_;
+
+    return $self->{_cfg}->{$key};
+}
+
+1;    # End of Net::Squid::Auth::Plugin::SimpleLDAP
+
+__END__
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -66,29 +169,6 @@ Constructor. Expects a hash reference with all the configuration under the
 section I<< <SimpleLDAP> >> in the C<$Config{InstallScript}/squid-auth-engine>
 as parameter. Returns a plugin instance.
 
-=cut
-
-sub new {
-    my ( $class, $config ) = @_;
-
-    my $reftype = reftype($config) || '';
-    croak 'Must pass a config hash' unless $reftype eq 'HASH';
-
-    # some reasonable defaults
-    $config->{userattr} = 'cn' unless $config->{userattr};
-    $config->{passattr} = 'userPassword'
-      unless $config->{passattr};
-    $config->{objclass} = 'person' unless $config->{objclass};
-
-    # required information
-    foreach my $required qw(binddn bindpw basedn server) {
-        croak qq{Missing config parameter '$required'}
-          unless $config->{$required};
-    }
-
-    return bless { _cfg => $config }, $class;
-}
-
 =head2 initialize()
 
 Initialization method called upon instantiation. This provides an opportunity
@@ -96,75 +176,11 @@ for the plugin initialize itself, stablish database connections and ensure it
 have all the necessary resources to verify the credentials presented. It
 receives no parameters and expect no return values.
 
-=cut
-
-sub initialize {
-    my $self = shift;
-
-    # connect
-    $self->{ldap} =
-         Net::LDAP->new( $self->config('server'), $self->config('NetLDAP') )
-      || croak "Cannot connect to LDAP server: " . $self->config()->{server};
-
-    # bind
-    my $mesg =
-      $self->{ldap}
-      ->bind( $self->config('binddn'), password => $self->config('bindpw') );
-    $mesg->code && croak "Error binding to LDAP server: " . $mesg->error;
-
-    return;
-}
-
 =head2 _search()
 
 Searches the LDAP server. It expects one parameter with a search string for
 the username. The search string must conform with the format used in LDAP
 queries, as defined in section 3 of RFC 4515.
-
-=cut
-
-sub _search {
-    my ( $self, $search ) = @_;
-
-    # search
-    my $mesg = $self->{ldap}->search(
-        base   => $self->config('basedn'),
-        scope  => 'sub',
-        filter => '(&(objectClass='
-          . $self->config('objclass') . ')('
-          . $self->config('userattr') . '='
-          . "$search" . '))',
-        attrs => [ $self->config('userattr'), $self->config('passattr') ],
-    );
-
-    # if errors
-    if ( $mesg->code ) {
-        $mesg = $self->{ldap}->unbind;
-        $mesg->code && croak "Error searching LDAP server: " . $mesg->error;
-    }
-
-    # get results
-    my @entries = $mesg->entries();
-    my $result  = {};
-
-    my $entry = shift @entries;
-    return $result unless $entry;
-
-    my $user;
-    if ( $self->config('userattr') =~ m/dn/i ) {
-        $user = $entry->dn();
-    }
-    else {
-        $user = $entry->get_value( $self->config('userattr') );
-    }
-    my $pw = $entry->get_value( $self->config('passattr') );
-
-    $result->{$user} = $pw;
-
-    carp "Found more than 1 entry for user ($user)" if shift @entries;
-
-    return $result;
-}
 
 =head2 is_valid( $username, $password )
 
@@ -172,75 +188,28 @@ This is the credential validation interface. It expects a username and password
 as parameters and returns a boolean indicating if the credentials are valid
 (i.e., are listed in the configuration file) or not.
 
-=cut
-
-sub is_valid {
-    my ( $self, $username, $password ) = @_;
-    my $result = $self->_search("$username");
-    return 0 unless exists $result->{$username};
-
-    return $result->{$username} eq $password;
-}
-
 =head2 config( $key )
 
 Accessor for a configuration setting given by key.
 
-=cut
-
-sub config {
-    my ( $self, $key ) = @_;
-
-    return $self->{_cfg}->{$key};
-}
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Net::Squid::Auth::Plugin::SimpleLDAP
-
-Or take a look at the github site to be up to date:
+=head1 SEE ALSO
 
 =over 4
 
-L<http://github.com/russoz/Net-Squid-Auth-Plugin-SimpleLDAP>
+=item *
+L<Net::Squid::Auth::Engine>, L<Net::LDAP>, L<Scalar::Util>
 
-=back
-
-You can also look for information at:
-
-=over 4
-
-=item * RFC 4515 - Lightweight Directory Access Protocol (LDAP): String Representation of Search Filters
+=item *
+RFC 4515 - Lightweight Directory Access Protocol (LDAP): String Representation of Search Filters
 
 L<http://www.faqs.org/rfcs/rfc4515.html>
 
-=item * RFC 4519 - Lightweight Directory Access Protocol (LDAP): Schema for User Applications
+=item *
+RFC 4519 - Lightweight Directory Access Protocol (LDAP): Schema for User Applications
 
 L<http://www.faqs.org/rfcs/rfc4519.html>
 
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Squid-Auth-Plugin-SimpleLDAP>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Net-Squid-Auth-Plugin-SimpleLDAP>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Net-Squid-Auth-Plugin-SimpleLDAP>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Net-Squid-Auth-Plugin-SimpleLDAP>
-
 =back
-
-=head1 SEE ALSO
-
-L<Net::Squid::Auth::Engine>, L<Net::LDAP>, L<Scalar::Util>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -253,6 +222,4 @@ To what I'd reply:
 "Only a master of Perl, Fields"
 
 =cut
-
-1;    # End of Net::Squid::Auth::Plugin::SimpleLDAP
 
