@@ -161,55 +161,34 @@ code of this module, in order to learn about it's internals and how it works.
 It may give you ideas about how to implement other plugin modules for
 L<Net::Squid::Auth::Engine>.
 
-=head1 METHODS
-
-=head2 new( $config_hash )
+=method new( $config_hash )
 
 Constructor. Expects a hash reference with all the configuration under the
 section I<< <SimpleLDAP> >> in the C<$Config{InstallScript}/squid-auth-engine>
 as parameter. Returns a plugin instance.
 
-=head2 initialize()
+=method initialize()
 
 Initialization method called upon instantiation. This provides an opportunity
 for the plugin initialize itself, stablish database connections and ensure it
 have all the necessary resources to verify the credentials presented. It
 receives no parameters and expect no return values.
 
-=head2 _search()
+=method _search()
 
 Searches the LDAP server. It expects one parameter with a search string for
 the username. The search string must conform with the format used in LDAP
 queries, as defined in section 3 of RFC 4515.
 
-=head2 is_valid( $username, $password )
+=method is_valid( $username, $password )
 
 This is the credential validation interface. It expects a username and password
 as parameters and returns a boolean indicating if the credentials are valid
 (i.e., are listed in the configuration file) or not.
 
-=head2 config( $key )
+=method config( $key )
 
 Accessor for a configuration setting given by key.
-
-=head1 SEE ALSO
-
-=over 4
-
-=item *
-L<Net::Squid::Auth::Engine>, L<Net::LDAP>, L<Scalar::Util>
-
-=item *
-RFC 4515 - Lightweight Directory Access Protocol (LDAP): String Representation of Search Filters
-
-L<http://www.faqs.org/rfcs/rfc4515.html>
-
-=item *
-RFC 4519 - Lightweight Directory Access Protocol (LDAP): Schema for User Applications
-
-L<http://www.faqs.org/rfcs/rfc4519.html>
-
-=back
 
 =head1 ACKNOWLEDGEMENTS
 
